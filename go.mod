@@ -9,7 +9,7 @@ require (
 	github.com/google/go-cmp v0.5.9
 	github.com/gorilla/websocket v1.5.0
 	github.com/lucas-clemente/quic-go v0.29.2
-	github.com/marten-seemann/qtls-go1-18 v0.1.3
+	github.com/marten-seemann/qtls-go1-18 v0.1.4
 	github.com/miekg/dns v1.1.50
 	github.com/pelletier/go-toml v1.9.5
 	github.com/pires/go-proxyproto v0.6.2
@@ -44,7 +44,6 @@ require (
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/riobard/go-bloom v0.0.0-20200614022211-cdc8013cb5b3 // indirect
-	github.com/stretchr/objx v0.4.0 // indirect
 	golang.org/x/exp v0.0.0-20221019170559-20944726eadf // indirect
 	golang.org/x/mod v0.6.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
