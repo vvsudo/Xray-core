@@ -40,8 +40,4 @@ type Context interface {
 
 	// GetSkipDNSResolve returns a flag switch for weather skip dns resolve during route pick.
 	GetSkipDNSResolve() bool
-
-	GetUid() uint32
-
-	GetAppStatus() []string
 }

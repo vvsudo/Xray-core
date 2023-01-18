@@ -11,10 +11,7 @@ import (
 	"github.com/xtls/xray-core/features/outbound"
 )
 
-var (
-	effectiveSystemDialer    SystemDialer = &DefaultSystemDialer{}
-	effectiveSystemDNSDialer SystemDialer = &DefaultSystemDialer{}
-)
+var effectiveSystemDialer SystemDialer = &DefaultSystemDialer{}
 
 type SystemDialer interface {
 	Dial(ctx context.Context, source net.Address, destination net.Destination, sockopt *SocketConfig) (net.Conn, error)
@@ -73,7 +70,7 @@ func (d *DefaultSystemDialer) Dial(ctx context.Context, src net.Address, dest ne
 		}, nil
 	}
 	goStdKeepAlive := time.Duration(0)
-	if sockopt != nil && sockopt.TcpKeepAliveIdle != 0 {
+	if sockopt != nil && (sockopt.TcpKeepAliveInterval != 0 || sockopt.TcpKeepAliveIdle != 0) {
 		goStdKeepAlive = time.Duration(-1)
 	}
 	dialer := &net.Dialer{
@@ -106,17 +103,6 @@ func (d *DefaultSystemDialer) Dial(ctx context.Context, src net.Address, dest ne
 	}
 
 	return dialer.DialContext(ctx, dest.Network.SystemString(), dest.NetAddr())
-}
-
-func ApplySockopt(sockopt *SocketConfig, dest net.Destination, fd uintptr, ctx context.Context) {
-	if err := applyOutboundSocketOptions(dest.Network.String(), dest.Address.String(), fd, sockopt); err != nil {
-		newError("failed to apply socket options").Base(err).WriteToLog(session.ExportIDToError(ctx))
-	}
-	if dest.Network == net.Network_UDP && hasBindAddr(sockopt) {
-		if err := bindAddr(fd, sockopt.BindAddress, sockopt.BindPort); err != nil {
-			newError("failed to bind source address to ", sockopt.BindAddress).Base(err).WriteToLog(session.ExportIDToError(ctx))
-		}
-	}
 }
 
 type PacketConnWrapper struct {
@@ -192,13 +178,6 @@ func UseAlternativeSystemDialer(dialer SystemDialer) {
 		dialer = &DefaultSystemDialer{}
 	}
 	effectiveSystemDialer = dialer
-}
-
-func UseAlternativeSystemDNSDialer(dialer SystemDialer) {
-	if dialer == nil {
-		effectiveSystemDNSDialer = &DefaultSystemDialer{}
-	}
-	effectiveSystemDNSDialer = dialer
 }
 
 // RegisterDialerController adds a controller to the effective system dialer.
